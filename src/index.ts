@@ -1,5 +1,6 @@
 import express, {Request, Response} from 'express'
 import {runDb} from "./repositories/db";
+import {blogsRouter} from "./routers/blogs-router";
 
 const app = express()
 
@@ -14,6 +15,8 @@ app.use(async (_req, _res, next) => {
 app.get('/', (_req: Request, res: Response) => {
     res.send('Всем саламалейкум')
 })
+
+app.use('/blogs', blogsRouter)
 
 export default app
 

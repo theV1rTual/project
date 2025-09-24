@@ -1,5 +1,6 @@
-import {MongoClient } from 'mongodb'
+import {MongoClient, Collection } from 'mongodb'
 import * as dotenv from 'dotenv'
+import {BlogDbModel} from "../models/blog.model";
 dotenv.config()
 
 const url = process.env.MONGO_URL;
@@ -8,7 +9,7 @@ if (!url) {
 }
 const client = new MongoClient(url)
 //
-// export const blogsCollection = client.db('project2').collection('blogs');
+export const blogsCollection:Collection<BlogDbModel>  = client.db('project2').collection<BlogDbModel>('blogs');
 // export const postsCollection = client.db('project2').collection('posts');
 
 export const runDb = async () => {
