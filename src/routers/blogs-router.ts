@@ -7,3 +7,7 @@ blogsRouter.get('/', async (req: Request, res: Response) => {
     const blogs = await blogsRepository.getBlogs();
     res.send(blogs);
 })
+
+blogsRouter.post('/', async (req: Request, res: Response) => {
+
+})
