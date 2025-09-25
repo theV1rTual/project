@@ -30,7 +30,7 @@ postsRouter.post('/', basic, postCreateValidation, validateRequest, async (req: 
 })
 
 postsRouter.delete('/:id', basic, async (req: Request, res: Response) => {
-    const ok = await blogsRepository.deleteBLog(req.params.id);
+    const ok = await postsRepository.deletePost(req.params.id);
     if (!ok) res.sendStatus(404)
     res.sendStatus(204);
 })
