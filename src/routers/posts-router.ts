@@ -3,6 +3,7 @@ import {postsRepository} from "../repositories/posts-repository";
 import {basic} from "../middlewares/validators/auth";
 import {blogsRepository} from "../repositories/blogs-repository";
 import {postCreateValidation} from "../middlewares/validators/posts";
+import {validateRequest} from "../middlewares/validators/validateRequest";
 
 export const postsRouter = Router({})
 
@@ -17,13 +18,13 @@ postsRouter.get('/:id', async (req: Request,  res: Response) => {
     res.status(200).json(post)
 })
 
-postsRouter.put('/:id', basic, postCreateValidation, async (req: Request, res: Response) => {
+postsRouter.put('/:id', basic, postCreateValidation, validateRequest, async (req: Request, res: Response) => {
     const ok = await postsRepository.update(req.params.id, req.body);
     if (!ok) res.sendStatus(404);
     res.sendStatus(204);
 })
 
-postsRouter.post('/', basic, postCreateValidation, async (req: Request, res: Response) => {
+postsRouter.post('/', basic, postCreateValidation, validateRequest, async (req: Request, res: Response) => {
     const created = await postsRepository.createPost(req.body);
     res.status(201).json(created)
 })
