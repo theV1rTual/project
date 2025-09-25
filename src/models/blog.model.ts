@@ -1,5 +1,7 @@
+import {ObjectId} from 'mongodb'
+
 export type BlogDbModel = {
-    _id: string;
+    _id: ObjectId;
     name: string;
     description: string;
     websiteUrl: string
@@ -7,6 +9,12 @@ export type BlogDbModel = {
 
 export type BlogModel = {
     id: string;
+    name: string;
+    description: string;
+    websiteUrl: string;
+}
+
+export type CreateBlogModel = {
     name: string;
     description: string;
     websiteUrl: string;
