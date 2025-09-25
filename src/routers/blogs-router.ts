@@ -3,6 +3,7 @@ import {blogsRepository} from "../repositories/blogs-repository";
 import {blogCreateValidation} from "../middlewares/validators/blogs";
 import {validateRequest} from "../middlewares/validators/validateRequest";
 import {blogsCollection} from "../repositories/db";
+import {basic} from "../middlewares/validators/auth";
 
 export const blogsRouter = Router({})
 
@@ -17,18 +18,18 @@ blogsRouter.get('/:id', async (req: Request, res: Response) => {
     res.status(200).json(blog);
 })
 
-blogsRouter.put('/:id', async (req: Request, res: Response) => {
+blogsRouter.put('/:id', basic, async (req: Request, res: Response) => {
     const ok = await blogsRepository.update(req.params.id, req.body);
     if (!ok) res.sendStatus(404);
     res.sendStatus(204);
 })
 
-blogsRouter.post('/', blogCreateValidation, validateRequest, async (req: Request, res: Response) => {
+blogsRouter.post('/', basic, blogCreateValidation, validateRequest, async (req: Request, res: Response) => {
     const created = await blogsRepository.createBlog(req.body);
     res.status(201).json(created)
 })
 
-blogsRouter.delete('/:id', async (req: Request, res: Response) => {
+blogsRouter.delete('/:id', basic, async (req: Request, res: Response) => {
     const ok = await blogsRepository.deleteBLog(req.params.id);
     if (!ok) res.sendStatus(404);
     res.sendStatus(204);
