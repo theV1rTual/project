@@ -1,8 +1,8 @@
-import express, {NextFunction, Request, Response} from 'express'
+import express, { Request, Response} from 'express'
 import {runDb} from "./repositories/db";
 import {blogsRouter} from "./routers/blogs-router";
-import expressBasicAuth from "express-basic-auth";
 import {testingRouter} from "./routers/testing-router";
+import {postsRouter} from "./routers/posts-router";
 
 const app = express()
 
@@ -21,6 +21,7 @@ app.get('/', (_req: Request, res: Response) => {
 })
 
 app.use('/blogs', blogsRouter)
+app.use('/posts', postsRouter)
 
 export default app
 
