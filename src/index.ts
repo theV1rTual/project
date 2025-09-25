@@ -10,7 +10,7 @@ const ready = runDb();
 
 app.use(express.json())
 
-app.use('testing', testingRouter)
+app.use('/testing', testingRouter)
 
 app.use(expressBasicAuth({
     users: {'admin': 'qwerty'},
