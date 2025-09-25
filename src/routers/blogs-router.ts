@@ -18,7 +18,7 @@ blogsRouter.get('/:id', async (req: Request, res: Response) => {
     res.status(200).json(blog);
 })
 
-blogsRouter.put('/:id', basic, async (req: Request, res: Response) => {
+blogsRouter.put('/:id', basic, blogCreateValidation, async (req: Request, res: Response) => {
     const ok = await blogsRepository.update(req.params.id, req.body);
     if (!ok) res.sendStatus(404);
     res.sendStatus(204);
