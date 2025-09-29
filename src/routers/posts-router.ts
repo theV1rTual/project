@@ -1,7 +1,6 @@
 import {Router, Request, Response} from "express";
 import {postsRepository} from "../repositories/posts-repository";
-import {basic} from "../middlewares/validators/auth";
-import {blogsRepository} from "../repositories/blogs-repository";
+import {basic} from "../middlewares/auth";
 import {postCreateValidation} from "../middlewares/validators/posts";
 import {validateRequest} from "../middlewares/validators/validateRequest";
 

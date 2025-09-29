@@ -8,7 +8,8 @@ const mapPost = (doc: PostDbModel): PostModel => ({
     blogName: doc.blogName,
     content: doc.content,
     shortDescription: doc.shortDescription,
-    title: doc.title
+    title: doc.title,
+    createdAt: doc.createdAt
 })
 
 export const postsRepository = {
@@ -30,7 +31,8 @@ export const postsRepository = {
             title: post.title,
             shortDescription: post.shortDescription,
             content: post.content,
-            blogName: '123'
+            blogName: '123',
+            createdAt: new Date()
         }
 
         const result = await postsCollection.insertOne(insertDoc)

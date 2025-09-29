@@ -7,6 +7,8 @@ const mapBlog = (doc: BlogDbModel): BlogModel => ({
     name: doc.name,
     description: doc.description,
     websiteUrl: doc.websiteUrl,
+    isMembership: doc.isMembership,
+    createdAt: doc.createdAt
 });
 
 export const blogsRepository = {
@@ -26,8 +28,10 @@ export const blogsRepository = {
         const insertDoc: BlogDbModel = {
             _id: new ObjectId(),
             name: blog.name,
+            isMembership: false,
             description: blog.description,
-            websiteUrl: blog.websiteUrl
+            websiteUrl: blog.websiteUrl,
+            createdAt: new Date()
         }
         const result = await blogsCollection.insertOne(insertDoc);
         return mapBlog(insertDoc)

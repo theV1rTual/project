@@ -7,6 +7,7 @@ export type PostDbModel = {
     content: string;
     blogId: string;
     blogName: string;
+    createdAt: Date;
 }
 
 export type PostModel = {
@@ -16,6 +17,7 @@ export type PostModel = {
     content: string;
     blogId: string;
     blogName: string;
+    createdAt: Date;
 }
 
 export type CreatePostModel = {

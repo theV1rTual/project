@@ -5,6 +5,8 @@ export type BlogDbModel = {
     name: string;
     description: string;
     websiteUrl: string
+    isMembership: boolean;
+    createdAt: Date;
 }
 
 export type BlogModel = {
@@ -12,6 +14,8 @@ export type BlogModel = {
     name: string;
     description: string;
     websiteUrl: string;
+    isMembership: boolean;
+    createdAt: Date;
 }
 
 export type CreateBlogModel = {
