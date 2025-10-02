@@ -67,6 +67,9 @@ blogsRouter.post('/', basic, blogCreateValidation, validateRequest, async (req: 
 
 blogsRouter.post('/:id/posts', basic, validateRequest, async (req: Request, res: Response) => {
     const created = await blogsRepository.createBlogPost(req.params.id, req.body);
+    if (!created) {
+        res.sendStatus(404);
+    }
     res.status(201).json(created);
 })
 

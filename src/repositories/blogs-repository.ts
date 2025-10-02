@@ -101,7 +101,13 @@ export const blogsRepository = {
         return mapBlog(insertDoc)
     },
 
-    async createBlogPost(blogId: string, blogPost: CreateBlogPost): Promise<BlogPost> {
+    async createBlogPost(blogId: string, blogPost: CreateBlogPost): Promise<BlogPost | null> {
+
+        const blog = await blogsCollection.findOne({ _id: new ObjectId(blogId) });
+        if (!blog) {
+            return null;
+        }
+
         const insertDoc = {
             _id: new ObjectId(),
             title: blogPost.title,
