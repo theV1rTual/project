@@ -71,6 +71,11 @@ export const blogsRepository = {
     }) {
         const { sortBy, sortDirection, pageNumber, pageSize, blogId } = params;
 
+        const doc = await postsCollection.findOne({_id: new ObjectId(blogId)})
+        if (!doc) {
+            return null;
+        }
+
         const filter: any = { blogId }; // ← ОБЯЗАТЕЛЬНО
 
         const sortField = POST_SORTABLE_FIELDS.has(sortBy) ? sortBy : 'createdAt';

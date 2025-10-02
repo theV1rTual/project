@@ -49,6 +49,10 @@ blogsRouter.get('/:id/posts', async (req, res) => {
         pageSize: Number(pageSize) || 10,
     });
 
+    if (!result) {
+        return res.sendStatus(404);
+    }
+
     return res.status(200).json(result);
 });
 
