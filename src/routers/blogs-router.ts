@@ -49,6 +49,11 @@ blogsRouter.get('/:id/posts', async (req: Request, res: Response) => {
         blogId: req.params.id
     }
 
+    const blog = await blogsRepository.findOneBlog(req.params.id);
+    if (!blog) {
+        return res.sendStatus(404);
+    }
+
     const blogs = await blogsRepository.findAllBlogPosts(query)
     return res.status(200).send(blogs);
 })

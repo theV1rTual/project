@@ -55,9 +55,12 @@ export const blogsRepository = {
         sortBy: string,
         sortDirection: string,
         pageNumber: number,
-        pageSize: number
+        pageSize: number,
+        blogId: string
     }) {
-        const { sortBy, sortDirection, pageNumber, pageSize } = params
+        const { sortBy, sortDirection, pageNumber, pageSize, blogId } = params
+
+
 
         const filter: any = {}
 
