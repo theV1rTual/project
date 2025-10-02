@@ -43,6 +43,11 @@ blogsRouter.post('/', basic, blogCreateValidation, validateRequest, async (req: 
     res.status(201).json(created)
 })
 
+blogsRouter.post('/:id/posts', basic, validateRequest, async (req: Request, res: Response) => {
+    const created = await blogsRepository.createBlogPost(req.params.id, req.body);
+    res.status(201).json(created);
+})
+
 blogsRouter.delete('/:id', basic, async (req: Request, res: Response) => {
     const ok = await blogsRepository.deleteBLog(req.params.id);
     if (!ok) res.sendStatus(404);

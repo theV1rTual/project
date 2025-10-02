@@ -1,6 +1,7 @@
 import {blogsCollection} from "./db";
 import {BlogDbModel, BlogModel, CreateBlogModel} from "../models/blog.model";
 import {ObjectId} from 'mongodb'
+import {BlogPost, CreateBlogPost, CreatePostModel} from "../models/post.model";
 
 const mapBlog = (doc: BlogDbModel): BlogModel => ({
     id: doc._id.toString(),
@@ -67,6 +68,29 @@ export const blogsRepository = {
         }
         const result = await blogsCollection.insertOne(insertDoc);
         return mapBlog(insertDoc)
+    },
+
+    async createBlogPost(blogId: string, blogPost: CreateBlogPost): Promise<BlogPost> {
+        const insertDoc = {
+            _id: new ObjectId(),
+            title: blogPost.title,
+            shortDescription: blogPost.shortDescription,
+            content: blogPost.content,
+            blogId,
+            blogName: "123",
+            createdAt: new Date()
+        }
+
+        const result = await blogsCollection.insertOne(insertDoc);
+        return {
+            id: insertDoc._id.toString(),
+            title: insertDoc.title,
+            shortDescription: insertDoc.shortDescription,
+            content: insertDoc.content,
+            blogId: insertDoc.blogId,
+            blogName: insertDoc.blogName,
+            createdAt: insertDoc.createdAt
+        }
     },
 
     async deleteBLog(id: string) {

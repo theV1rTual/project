@@ -26,3 +26,19 @@ export type CreatePostModel = {
     content: string;
     blogId: string;
 }
+
+export type CreateBlogPost =  {
+    title: string;
+    shortDescription: string;
+    content: string;
+}
+
+export type BlogPost = {
+    id: string,
+    title: string,
+    shortDescription: string,
+    content: string,
+    blogId: string,
+    blogName: string,
+    createdAt: Date
+}
