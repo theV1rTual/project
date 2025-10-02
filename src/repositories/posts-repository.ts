@@ -22,29 +22,28 @@ export const postsRepository = {
         pageNumber: number,
         pageSize: number
     }) {
-
         const { sortBy, sortDirection, pageNumber, pageSize } = params;
 
-        const filter: any = {}
+        const filter: any = {};
 
         const sortField = POST_SORTABLE_FIELDS.has(sortBy) ? sortBy : 'createdAt';
         const sortValue = sortDirection === 'asc' ? 1 : -1;
 
-        const totalCount = await postsCollection.countDocuments(filter)
+        const totalCount = await postsCollection.countDocuments(filter);
 
-        const docs  = await blogsCollection.find(filter)
-            .sort({ [sortField === 'id' ? '_id' : sortField] : sortValue})
+        const docs = await postsCollection.find(filter) // ← тут была ошибка
+            .sort({ [sortField === 'id' ? '_id' : sortField]: sortValue })
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .toArray();
 
         return {
             pagesCount: Math.ceil(totalCount / pageSize) || 0,
             page: pageNumber,
             pageSize,
             totalCount,
-            items: docs.map(mapPost)
-        }
+            items: docs.map(mapPost),
+        };
     },
 
     async findOnePost(id: string): Promise<PostModel | null> {

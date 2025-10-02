@@ -69,30 +69,28 @@ export const blogsRepository = {
         pageSize: number,
         blogId: string
     }) {
-        const { sortBy, sortDirection, pageNumber, pageSize, blogId } = params
+        const { sortBy, sortDirection, pageNumber, pageSize, blogId } = params;
 
-
-
-        const filter: any = {}
+        const filter: any = { blogId }; // ← ОБЯЗАТЕЛЬНО
 
         const sortField = POST_SORTABLE_FIELDS.has(sortBy) ? sortBy : 'createdAt';
         const sortValue = sortDirection === 'asc' ? 1 : -1;
 
-        const totalCount = await postsCollection.countDocuments(filter)
+        const totalCount = await postsCollection.countDocuments(filter);
 
-        const docs  = await postsCollection.find(filter)
-            .sort({ [sortField === 'id' ? '_id' : sortField] : sortValue})
+        const docs = await postsCollection.find(filter)
+            .sort({ [sortField === 'id' ? '_id' : sortField]: sortValue })
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .toArray();
 
         return {
             pagesCount: Math.ceil(totalCount / pageSize) || 0,
             page: pageNumber,
             pageSize,
             totalCount,
-            items: docs.map(mapPost)
-        }
+            items: docs.map(mapPost),
+        };
     },
 
     async findOneBlog(id: string): Promise<BlogModel | null> {

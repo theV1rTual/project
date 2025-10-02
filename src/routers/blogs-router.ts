@@ -33,30 +33,24 @@ blogsRouter.get('/:id', async (req: Request, res: Response) => {
 })
 
 
-blogsRouter.get('/:id/posts', async (req: Request, res: Response) => {
+blogsRouter.get('/:id/posts', async (req, res) => {
     const {
-        pageNumber = 1,
-        pageSize = 10,
+        pageNumber = '1',
+        pageSize = '10',
         sortBy = 'createdAt',
         sortDirection = 'desc',
-    } = req.query;
+    } = req.query as Record<string, string>;
 
-    const query = {
-        pageNumber,
-        pageSize,
+    const result = await blogsRepository.findAllBlogPosts({
+        blogId: req.params.id,
         sortBy,
-        sortDirection,
-        blogId: req.params.id
-    }
+        sortDirection: sortDirection === 'asc' ? 'asc' : 'desc',
+        pageNumber: Number(pageNumber) || 1,
+        pageSize: Number(pageSize) || 10,
+    });
 
-    const blog = await blogsRepository.findOneBlog(req.params.id);
-    if (!blog) {
-        return res.sendStatus(404);
-    }
-
-    const blogs = await blogsRepository.findAllBlogPosts(query)
-    return res.status(200).send(blogs);
-})
+    return res.status(200).json(result);
+});
 
 blogsRouter.put('/:id', basic, blogCreateValidation, validateRequest, async (req: Request, res: Response) => {
     const ok = await blogsRepository.update(req.params.id, req.body);
