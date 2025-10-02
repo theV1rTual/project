@@ -1,8 +1,8 @@
 import {CreatePostModel, PostDbModel, PostModel} from "../models/post.model";
-import {postsCollection} from "./db";
+import {blogsCollection, postsCollection} from "./db";
 import {ObjectId} from 'mongodb';
 
-const mapPost = (doc: PostDbModel): PostModel => ({
+const mapPost = (doc): PostModel => ({
     id: doc._id.toString(),
     blogId: doc.blogId,
     blogName: doc.blogName,
@@ -12,10 +12,39 @@ const mapPost = (doc: PostDbModel): PostModel => ({
     createdAt: doc.createdAt
 })
 
+const POST_SORTABLE_FIELDS = new Set(['title', 'shortDescription', 'content', 'blogId', 'blogName', 'createdAt', '_id', 'id'])
+
+
 export const postsRepository = {
-    async findAllPosts(): Promise<PostModel[]> {
-        const docs = await postsCollection.find({}).toArray();
-        return docs.map(mapPost);
+    async findAllPosts(params: {
+        sortBy: string,
+        sortDirection: string,
+        pageNumber: number,
+        pageSize: number
+    }) {
+
+        const { sortBy, sortDirection, pageNumber, pageSize } = params;
+
+        const filter: any = {}
+
+        const sortField = POST_SORTABLE_FIELDS.has(sortBy) ? sortBy : 'createdAt';
+        const sortValue = sortDirection === 'asc' ? 1 : -1;
+
+        const totalCount = await postsCollection.countDocuments(filter)
+
+        const docs  = await blogsCollection.find(filter)
+            .sort({ [sortField === 'id' ? '_id' : sortField] : sortValue})
+            .skip((pageNumber - 1) * pageSize)
+            .limit(pageSize)
+            .toArray()
+
+        return {
+            pagesCount: Math.ceil(totalCount / pageSize) || 0,
+            page: pageNumber,
+            pageSize,
+            totalCount,
+            items: docs.map(mapPost)
+        }
     },
 
     async findOnePost(id: string): Promise<PostModel | null> {

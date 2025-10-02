@@ -7,6 +7,19 @@ import {validateRequest} from "../middlewares/validators/validateRequest";
 export const postsRouter = Router({})
 
 postsRouter.get('/', async (req: Request, res: Response) => {
+    const {
+        pageNumber = 1,
+        pageSize = 10,
+        sortBy = 'createdAt',
+        sortDirection = 'desc'
+    } = req.query
+
+    const query = {
+        pageNumber: Number(pageNumber),
+        pageSize: Number(pageSize),
+        sortBy: sortBy.toString(),
+        sortDirection: sortDirection.toString()
+    }
     const posts = await postsRepository.findAllPosts();
     res.status(200).json(posts);
 })
