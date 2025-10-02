@@ -72,9 +72,9 @@ blogsRouter.post('/:id/posts', basic, validateRequest, async (req: Request, res:
         content: req.body.content,
     });
     if (!created) {
-        res.sendStatus(404);
+        return res.sendStatus(404);
     }
-    res.status(201).json(created);
+    return res.status(201).json(created);
 })
 
 blogsRouter.delete('/:id', basic, async (req: Request, res: Response) => {
