@@ -2,7 +2,7 @@ import {CreatePostModel, PostDbModel, PostModel} from "../models/post.model";
 import {blogsCollection, postsCollection} from "./db";
 import {ObjectId} from 'mongodb';
 
-const mapPost = (doc): PostModel => ({
+const mapPost = (doc: any): PostModel => ({
     id: doc._id.toString(),
     blogId: doc.blogId,
     blogName: doc.blogName,
