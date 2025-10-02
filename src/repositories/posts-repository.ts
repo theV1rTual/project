@@ -29,10 +29,18 @@ export const postsRepository = {
         const sortField = POST_SORTABLE_FIELDS.has(sortBy) ? sortBy : 'createdAt';
         const sortValue = sortDirection === 'asc' ? 1 : -1;
 
+        // 👇 Стабильная композитная сортировка
+        const sortSpec: Record<string, 1 | -1> = {
+            [sortField === 'id' ? '_id' : sortField]: sortValue,
+        };
+        if (sortField !== 'createdAt') sortSpec['createdAt'] = sortValue;
+        // На случай одинаковых дат
+        sortSpec['_id'] = sortValue;
+
         const totalCount = await postsCollection.countDocuments(filter);
 
-        const docs = await postsCollection.find(filter) // ← тут была ошибка
-            .sort({ [sortField === 'id' ? '_id' : sortField]: sortValue })
+        const docs = await postsCollection.find(filter)
+            .sort(sortSpec)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
             .toArray();
