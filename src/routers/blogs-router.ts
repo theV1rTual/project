@@ -1,6 +1,6 @@
 import {Router, Request, Response} from "express";
 import {blogsRepository} from "../repositories/blogs-repository";
-import {blogCreateValidation} from "../middlewares/validators/blogs";
+import {blogCreateValidation, blogPostCreateValidation} from "../middlewares/validators/blogs";
 import {validateRequest} from "../middlewares/validators/validateRequest";
 import {basic} from "../middlewares/auth";
 
@@ -69,7 +69,7 @@ blogsRouter.post('/', basic, blogCreateValidation, validateRequest, async (req: 
     res.status(201).json(created)
 })
 
-blogsRouter.post('/:id/posts', basic, validateRequest, async (req: Request, res: Response) => {
+blogsRouter.post('/:id/posts', basic, blogPostCreateValidation, validateRequest, async (req: Request, res: Response) => {
     const created = await blogsRepository.createBlogPost(req.params.id, {
         title: req.body.title,
         shortDescription: req.body.shortDescription,
