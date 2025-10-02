@@ -51,6 +51,7 @@ blogsRouter.get('/:id/posts', async (req: Request, res: Response) => {
     }
 
     const blogs = await blogsRepository.findAllBlogPosts(query)
+    return res.status(200).send(blogs);
 })
 
 blogsRouter.put('/:id', basic, blogCreateValidation, validateRequest, async (req: Request, res: Response) => {
