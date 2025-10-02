@@ -1,7 +1,8 @@
 import {blogsCollection, postsCollection} from "./db";
 import {BlogDbModel, BlogModel, CreateBlogModel} from "../models/blog.model";
 import {ObjectId} from 'mongodb'
-import {BlogPost, CreateBlogPost, CreatePostModel} from "../models/post.model";
+import {BlogPost, CreateBlogPost, CreatePostModel, PostDbModel} from "../models/post.model";
+import {postsRepository} from "./posts-repository";
 
 const mapBlog = (doc: BlogDbModel): BlogModel => ({
     id: doc._id.toString(),
@@ -10,6 +11,16 @@ const mapBlog = (doc: BlogDbModel): BlogModel => ({
     websiteUrl: doc.websiteUrl,
     isMembership: doc.isMembership,
     createdAt: doc.createdAt
+});
+
+export const mapPost = (doc: PostDbModel) => ({
+    id: doc._id.toString(),
+    title: doc.title,
+    shortDescription: doc.shortDescription,
+    content: doc.content,
+    blogId: doc.blogId,
+    blogName: doc.blogName,
+    createdAt: doc.createdAt,
 });
 
 const BLOG_SORTABLE_FIELDS = new Set(['name', 'description', 'websiteUrl', 'createdAt', 'isMembership', '_id', 'id'])
@@ -67,9 +78,9 @@ export const blogsRepository = {
         const sortField = POST_SORTABLE_FIELDS.has(sortBy) ? sortBy : 'createdAt';
         const sortValue = sortDirection === 'asc' ? 1 : -1;
 
-        const totalCount = await blogsCollection.countDocuments(filter)
+        const totalCount = await postsCollection.countDocuments(filter)
 
-        const docs  = await blogsCollection.find(filter)
+        const docs  = await postsCollection.find(filter)
             .sort({ [sortField === 'id' ? '_id' : sortField] : sortValue})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
@@ -80,7 +91,7 @@ export const blogsRepository = {
             page: pageNumber,
             pageSize,
             totalCount,
-            items: docs.map(mapBlog)
+            items: docs.map(mapPost)
         }
     },
 

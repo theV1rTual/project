@@ -16,11 +16,11 @@ blogsRouter.get('/', async (req: Request, res: Response) => {
     } = req.query
 
     const query = {
-        searchNameTerm,
-        sortBy,
-        sortDirection,
-        pageNumber,
-        pageSize
+        searchNameTerm: searchNameTerm?.toString(),
+        sortBy: sortBy.toString(),
+        sortDirection: sortDirection.toString(),
+        pageNumber: Number(pageNumber),
+        pageSize: Number(pageSize)
     }
     const blogs = await blogsRepository.findAllBlogs(query);
     return res.status(200).send(blogs);
