@@ -7,7 +7,22 @@ import {basic} from "../middlewares/auth";
 export const blogsRouter = Router({})
 
 blogsRouter.get('/', async (req: Request, res: Response) => {
-    const blogs = await blogsRepository.findAllBlogs();
+    const {
+        searchNameTerm = null,
+        sortBy = 'createdAt',
+        sortDirection = 'desc',
+        pageNumber = 1,
+        pageSize = 10,
+    } = req.query
+
+    const query = {
+        searchNameTerm,
+        sortBy,
+        sortDirection,
+        pageNumber,
+        pageSize
+    }
+    const blogs = await blogsRepository.findAllBlogs(query);
     return res.status(200).send(blogs);
 })
 

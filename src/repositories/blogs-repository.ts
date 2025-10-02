@@ -11,10 +11,42 @@ const mapBlog = (doc: BlogDbModel): BlogModel => ({
     createdAt: doc.createdAt
 });
 
+const SORTABLE_FIELDS = new Set(['name', 'description', 'websiteUrl', 'createdAt', 'isMembership', '_id', 'id'])
+
 export const blogsRepository = {
-    async findAllBlogs(): Promise<BlogModel[]> {
-        const docs = await blogsCollection.find({}).toArray();
-        return docs.map(mapBlog);
+    async findAllBlogs(params: {
+        searchNameTerm?: string | null,
+        sortBy: string,
+        sortDirection: string,
+        pageNumber: number,
+        pageSize: number
+    }) {
+        const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } = params;
+
+        const filter: any = {}
+
+        if (searchNameTerm && searchNameTerm.trim().length > 0) {
+            filter.name = {$regex: searchNameTerm.trim(), $options: 'i'}
+        }
+
+        const sortField = SORTABLE_FIELDS.has(sortBy) ? sortBy : 'createdAt';
+        const sortValue = sortDirection === 'asc' ? 1 : -1;
+
+        const totalCount = await blogsCollection.countDocuments(filter)
+
+        const docs  = await blogsCollection.find(filter)
+            .sort({ [sortField === 'id' ? '_id' : sortField] : sortValue})
+            .skip((pageNumber - 1) * pageSize)
+            .limit(pageSize)
+            .toArray()
+
+        return {
+            pagesCount: Math.ceil(totalCount / pageSize) || 0;
+            page: pageNumber,
+            pageSize,
+            totalCount,
+            items: docs.map(mapBlog)
+        }
     },
 
     async findOneBlog(id: string): Promise<BlogModel | null> {
