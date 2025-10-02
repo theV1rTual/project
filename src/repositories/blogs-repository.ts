@@ -103,6 +103,8 @@ export const blogsRepository = {
 
     async createBlogPost(blogId: string, blogPost: CreateBlogPost): Promise<BlogPost | null> {
 
+        if (!ObjectId.isValid(blogId)) return null;
+
         const blog = await blogsCollection.findOne({ _id: new ObjectId(blogId) });
         if (!blog) {
             return null;
