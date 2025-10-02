@@ -39,7 +39,6 @@ blogsRouter.get('/:id/posts', async (req: Request, res: Response) => {
         pageSize = 10,
         sortBy = 'createdAt',
         sortDirection = 'desc',
-        blogId
     } = req.query;
 
     const query = {
@@ -47,7 +46,7 @@ blogsRouter.get('/:id/posts', async (req: Request, res: Response) => {
         pageSize,
         sortBy,
         sortDirection,
-        blogId
+        blogId: req.params.id
     }
 
     const blogs = await blogsRepository.findAllBlogPosts(query)
