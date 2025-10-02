@@ -1,8 +1,7 @@
 import {blogsCollection, postsCollection} from "./db";
 import {BlogDbModel, BlogModel, CreateBlogModel} from "../models/blog.model";
 import {ObjectId} from 'mongodb'
-import {BlogPost, CreateBlogPost, CreatePostModel, PostDbModel} from "../models/post.model";
-import {postsRepository} from "./posts-repository";
+import {BlogPost, CreateBlogPost, PostDbModel} from "../models/post.model";
 
 const mapBlog = (doc: BlogDbModel): BlogModel => ({
     id: doc._id.toString(),
@@ -62,6 +61,7 @@ export const blogsRepository = {
         }
     },
 
+    // blogs-repository.ts
     async findAllBlogPosts(params: {
         sortBy: string,
         sortDirection: string,
@@ -71,18 +71,12 @@ export const blogsRepository = {
     }) {
         const { sortBy, sortDirection, pageNumber, pageSize, blogId } = params;
 
-        const doc = await postsCollection.findOne({_id: new ObjectId(blogId)})
-        if (!doc) {
-            return null;
-        }
-
-        const filter: any = { blogId }; // ← ОБЯЗАТЕЛЬНО
+        const filter: any = { blogId };
 
         const sortField = POST_SORTABLE_FIELDS.has(sortBy) ? sortBy : 'createdAt';
         const sortValue = sortDirection === 'asc' ? 1 : -1;
 
         const totalCount = await postsCollection.countDocuments(filter);
-
         const docs = await postsCollection.find(filter)
             .sort({ [sortField === 'id' ? '_id' : sortField]: sortValue })
             .skip((pageNumber - 1) * pageSize)

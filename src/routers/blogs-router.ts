@@ -33,6 +33,7 @@ blogsRouter.get('/:id', async (req: Request, res: Response) => {
 })
 
 
+// blogsRouter.ts
 blogsRouter.get('/:id/posts', async (req, res) => {
     const {
         pageNumber = '1',
@@ -41,6 +42,11 @@ blogsRouter.get('/:id/posts', async (req, res) => {
         sortDirection = 'desc',
     } = req.query as Record<string, string>;
 
+    // 1) Проверяем, что блог существует
+    const blog = await blogsRepository.findOneBlog(req.params.id);
+    if (!blog) return res.sendStatus(404);
+
+    // 2) Просто выбираем посты блога
     const result = await blogsRepository.findAllBlogPosts({
         blogId: req.params.id,
         sortBy,
@@ -48,10 +54,6 @@ blogsRouter.get('/:id/posts', async (req, res) => {
         pageNumber: Number(pageNumber) || 1,
         pageSize: Number(pageSize) || 10,
     });
-
-    if (!result) {
-        return res.sendStatus(404);
-    }
 
     return res.status(200).json(result);
 });
