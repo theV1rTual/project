@@ -20,7 +20,7 @@ postsRouter.get('/', async (req: Request, res: Response) => {
         sortBy: sortBy.toString(),
         sortDirection: sortDirection.toString()
     }
-    const posts = await postsRepository.findAllPosts();
+    const posts = await postsRepository.findAllPosts(query);
     res.status(200).json(posts);
 })
 
