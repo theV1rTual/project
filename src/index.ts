@@ -23,7 +23,7 @@ app.get('/', (_req: Request, res: Response) => {
 
 app.use('/blogs', blogsRouter)
 app.use('/posts', postsRouter)
-app.use('users', usersRouter)
+app.use('/users', usersRouter)
 
 export default app
 
