@@ -51,7 +51,7 @@ export const usersRepository = {
             .toArray()
 
         return {
-            pageCount: Math.ceil(totalCount/pageSize) || 0,
+            pagesCount: Math.ceil(totalCount/pageSize) || 0,
             page: pageNumber,
             pageSize,
             totalCount,

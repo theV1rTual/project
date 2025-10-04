@@ -4,6 +4,7 @@ import {blogsRouter} from "./routers/blogs-router";
 import {testingRouter} from "./routers/testing-router";
 import {postsRouter} from "./routers/posts-router";
 import {usersRouter} from "./routers/users-router";
+import {authRouter} from "./routers/auth-router";
 
 const app = express()
 
@@ -24,6 +25,7 @@ app.get('/', (_req: Request, res: Response) => {
 app.use('/blogs', blogsRouter)
 app.use('/posts', postsRouter)
 app.use('/users', usersRouter)
+app.use('/auth', authRouter)
 
 export default app
 
