@@ -6,7 +6,7 @@ export const userCreateValidation = [
         .trim()
         .notEmpty().withMessage('login is required')
         .isString().withMessage('login must be a string')
-        .matches('/^[a-zA-Z0-9._-]+$/').withMessage('login pattern does not match')
+        .matches('^[a-zA-Z0-9_-]*$').withMessage('login pattern does not match')
         .isLength({max: 10, min: 3}).withMessage('login length cannot be more than 30'),
 
     body('password')
