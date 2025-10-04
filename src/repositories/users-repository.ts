@@ -1,0 +1,91 @@
+import {usersRouter} from "../routers/users-router";
+import {usersCollection} from "./db";
+import {CreateUserModel, UserDbModel, UserModel} from "../models/user.model";
+import {ObjectId} from 'mongodb';
+
+const USERS_SORTABLE_FIELDS = new Set(['login', 'email', 'createdAt', 'id', '_id'])
+
+const mapUser = (doc: any): UserModel => ({
+    id: doc._id.toString(),
+    email: doc.email,
+    login: doc.login,
+    createdAt: doc.createdAt
+})
+
+export const usersRepository = {
+    async findAllUsers(params: {
+        sortBy: string,
+        sortDirection: string,
+        pageNumber: number,
+        pageSize: number,
+        searchLoginTerm: string,
+        searchEmailTerm: string
+    }) {
+        const { sortBy, sortDirection, pageNumber, pageSize, searchLoginTerm, searchEmailTerm } = params;
+
+        const or: any[] = [];
+        if (searchEmailTerm && searchEmailTerm.trim()) {
+            or.push({login: {$regex: searchLoginTerm.trim(), $options: 'i'}})
+        }
+        if (searchEmailTerm && searchEmailTerm.trim()) {
+            or.push({email: {$regex: searchEmailTerm.trim(), $options: 'i'}})
+        }
+
+        const filter = or.length ? {$or: or} : {}
+
+        const sortField = USERS_SORTABLE_FIELDS.has(sortBy) ? sortBy : 'createdAt';
+        const sortValue = sortDirection === 'asc' ? 1 : -1;
+
+        const sortSpec: Record<string, 1 | - 1> = {
+            [sortField === 'id' ? '_id' : sortField]: sortValue
+        }
+        if (sortField !== 'createdAt') sortSpec['createdAt'] = sortValue
+        sortSpec['_id'] = sortValue;
+
+        const totalCount = await usersCollection.countDocuments(filter);
+
+        const docs = await usersCollection.find(filter)
+            .sort(sortSpec)
+            .skip((pageNumber - 1) * pageSize)
+            .limit(pageSize)
+            .toArray()
+
+        return {
+            pageCount: Math.ceil(totalCount/pageSize) || 0,
+            page: pageNumber,
+            pageSize,
+            totalCount,
+            items: docs.map(mapUser)
+        }
+    },
+
+    async findByLogin(login: string): Promise<boolean> {
+        const doc = await usersCollection.findOne({login: {$regex: login, $options: 'i'} })
+        if (!doc) {
+            return false
+        }
+        return true
+    },
+
+    async deleteUser(id: string) {
+        if (!ObjectId.isValid(id)) return false;
+
+        const result = await usersCollection.deleteOne({_id: new ObjectId(id)})
+
+        return result.deletedCount === 1;
+    },
+
+    async create(data: {login: string, password: string, email: string}): Promise<UserModel> {
+        const doc: UserDbModel = {
+            _id: new ObjectId(),
+            createdAt: new Date(),
+            login: data.login,
+            email: data.email,
+        }
+
+        const {insertedId} = await usersCollection.insertOne(doc);
+        const created = await usersCollection.findOne({_id: insertedId})
+
+        return mapUser(created)
+    }
+}

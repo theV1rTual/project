@@ -12,6 +12,7 @@ const client = new MongoClient(url)
 //
 export const blogsCollection:Collection<BlogDbModel>  = client.db('project2').collection<BlogDbModel>('blogs');
 export const postsCollection:Collection<PostDbModel> = client.db('project2').collection<PostDbModel>('posts');
+export const usersCollection:Collection = client.db('project2').collection('users')
 
 export const runDb = async () => {
     try {
