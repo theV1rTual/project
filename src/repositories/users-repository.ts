@@ -2,6 +2,8 @@ import {usersRouter} from "../routers/users-router";
 import {usersCollection} from "./db";
 import {CreateUserModel, UserDbModel, UserModel} from "../models/user.model";
 import {ObjectId} from 'mongodb';
+import {UsersService} from "../bll/users-service";
+import {hashPassword} from "../common/hashing";
 
 const USERS_SORTABLE_FIELDS = new Set(['login', 'email', 'createdAt', 'id', '_id'])
 
@@ -67,6 +69,15 @@ export const usersRepository = {
         return true
     },
 
+    async login(params: {login: string, password: string}): Promise<boolean> {
+        const searchPassword = hashPassword(params.password);
+        const doc = await usersCollection.findOne({login: {$regex: params.login, $options: 'i'}, password: {$regex: searchPassword, $options: 'i'}})
+        if (!doc) {
+            return false;
+        }
+        return true;
+    },
+
     async deleteUser(id: string) {
         if (!ObjectId.isValid(id)) return false;
 
@@ -81,6 +92,7 @@ export const usersRepository = {
             createdAt: new Date(),
             login: data.login,
             email: data.email,
+            password: data.password
         }
 
         const {insertedId} = await usersCollection.insertOne(doc);

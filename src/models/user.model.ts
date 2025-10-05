@@ -5,6 +5,7 @@ export type UserDbModel = {
     login: string;
     email: string;
     createdAt: Date;
+    password: string;
 }
 
 export type UserModel = {
