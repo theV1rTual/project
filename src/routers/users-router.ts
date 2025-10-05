@@ -46,8 +46,8 @@ usersRouter.post('/', basic, userCreateValidation, validateRequest, async (req: 
     return res.status(201).send(user)
 })
 
-usersRouter.delete(':id', basic, async (req: Request, res: Response) => {
+usersRouter.delete('/:id', basic, async (req: Request, res: Response) => {
     const ok = await usersRepository.deleteUser(req.params.id);
-    if (!ok) res.sendStatus(404)
-    res.sendStatus(204)
+    if (!ok) return res.sendStatus(404)
+    return res.sendStatus(204)
 })
