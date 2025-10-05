@@ -4,11 +4,11 @@ import {usersRepository} from "../repositories/users-repository";
 
 export const authRouter = Router({})
 
-authRouter.post('/login', basic, async (req: Request, res: Response) => {
-    const ok = await usersRepository.login(req.body)
-    if (ok) {
-        return res.sendStatus(200)
-    }
-    return res.sendStatus(401)
-})
+authRouter.post('/login', async (req: Request, res: Response) => {
+    const ok = await usersRepository.login({
+        loginOrEmail: req.body?.loginOrEmail,
+        password: req.body?.password,
+    });
+    return ok ? res.sendStatus(204) : res.sendStatus(401);
+});
 

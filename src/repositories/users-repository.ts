@@ -14,6 +14,8 @@ const mapUser = (doc: any): UserModel => ({
     createdAt: doc.createdAt
 })
 
+function escapeRe(s: string) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
 export const usersRepository = {
     async findAllUsers(params: {
         sortBy: string,
@@ -70,12 +72,15 @@ export const usersRepository = {
     },
 
     async login(params: {loginOrEmail: string, password: string}): Promise<boolean> {
-        const doc = await usersCollection.findOne({$or : [{login: {$regex: params.loginOrEmail, $options: 'i'}, email: {$regex: params.loginOrEmail, $options: 'i'}}]})
-        if (!doc) {
-            return false;
-        }
+        const q = params.loginOrEmail?.trim();
+        const p = params.password;
+        if (!q || !p) return false;
 
-        return verifyPassword(doc.password, params.password)
+        const rx = new RegExp(`^${escapeRe(q)}$`, 'i');
+        const user = await usersCollection.findOne({ $or: [{ login: rx }, { email: rx }] });
+        if (!user?.passwordHash) return false;
+
+        return verifyPassword(p, user.passwordHash);
     },
 
     async deleteUser(id: string) {
