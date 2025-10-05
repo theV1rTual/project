@@ -69,9 +69,9 @@ export const usersRepository = {
         return true
     },
 
-    async login(params: {login: string, password: string}): Promise<boolean> {
+    async login(params: {loginOrEmail: string, password: string}): Promise<boolean> {
         const searchPassword = hashPassword(params.password);
-        const doc = await usersCollection.findOne({login: {$regex: params.login, $options: 'i'}, password: {$regex: searchPassword, $options: 'i'}})
+        const doc = await usersCollection.findOne({login: {$regex: params.loginOrEmail, $options: 'i'}, password: {$regex: searchPassword, $options: 'i'}})
         if (!doc) {
             return false;
         }
