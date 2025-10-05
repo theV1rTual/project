@@ -78,9 +78,9 @@ export const usersRepository = {
 
         const rx = new RegExp(`^${escapeRe(q)}$`, 'i');
         const user = await usersCollection.findOne({ $or: [{ login: rx }, { email: rx }] });
-        if (!user?.passwordHash) return false;
+        if (!user?.password) return false;
 
-        return verifyPassword(p, user.passwordHash);
+        return verifyPassword(p, user.password);
     },
 
     async deleteUser(id: string) {
