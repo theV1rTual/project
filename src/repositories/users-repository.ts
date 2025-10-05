@@ -3,7 +3,7 @@ import {usersCollection} from "./db";
 import {CreateUserModel, UserDbModel, UserModel} from "../models/user.model";
 import {ObjectId} from 'mongodb';
 import {UsersService} from "../bll/users-service";
-import {hashPassword} from "../common/hashing";
+import {hashPassword, verifyPassword} from "../common/hashing";
 
 const USERS_SORTABLE_FIELDS = new Set(['login', 'email', 'createdAt', 'id', '_id'])
 
@@ -70,12 +70,12 @@ export const usersRepository = {
     },
 
     async login(params: {loginOrEmail: string, password: string}): Promise<boolean> {
-        const searchPassword = hashPassword(params.password);
-        const doc = await usersCollection.findOne({login: {$regex: params.loginOrEmail, $options: 'i'}, password: {$regex: searchPassword, $options: 'i'}})
+        const doc = await usersCollection.findOne({$or : [{login: {$regex: params.loginOrEmail, $options: 'i'}, email: {$regex: params.loginOrEmail, $options: 'i'}}]})
         if (!doc) {
             return false;
         }
-        return true;
+
+        return verifyPassword(doc.password, params.password)
     },
 
     async deleteUser(id: string) {
