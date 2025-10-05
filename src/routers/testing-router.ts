@@ -14,6 +14,7 @@ testingRouter.delete('/all-data', async (req: Request, res: Response) => {
         await blogsCollection.deleteMany({})
         await postsCollection.deleteMany({})
         await usersCollection.deleteMany({})
+        console.log('22')
         res.sendStatus(204)
     } catch (e) {
         res.sendStatus(500)
