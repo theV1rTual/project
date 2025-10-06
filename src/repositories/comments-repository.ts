@@ -23,6 +23,17 @@ export const commentsRepository = {
         return comment ? mapComment(comment) : null;
     },
 
+    async deleteByIdAndOwner(id: string, ownerId: string): Promise<boolean> {
+        if (!ObjectId.isValid(id)) return false;
+
+        const res = await commentsCollection.deleteOne({
+            _id: new ObjectId(id),
+            'commentatorInfo.userId': ownerId, // userId в БД у тебя string
+        });
+
+        return res.deletedCount === 1;
+    },
+
     async findAllComments(params: {
         sortBy: string,
         sortDirection: string,
