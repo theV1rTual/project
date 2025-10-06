@@ -31,15 +31,31 @@ commentsRouter.delete('/:id', authMiddleware, async (req: Request, res: Response
 });
 
 commentsRouter.put('/:id', authMiddleware, async (req: Request, res: Response) => {
-    const doc = await commentsRepository.findCommentById(req.params.id);
+    const { id } = req.params;
 
-    if (doc?.commentatorInfo.userId === req.user?._id) {
-        const updated = await commentsRepository.update(req.params.id, req.body);
-        if (updated) {
-            return res.sendStatus(204)
-        }
-        return res.sendStatus(404)
+    // простая валидация id
+    if (!ObjectId.isValid(id)) {
+        res.sendStatus(400);
+        return;
     }
 
-    return res.sendStatus(403)
+    // атомарный апдейт: только если владелец совпадает
+    const ok = await commentsRepository.updateByIdAndOwner(
+        id,
+        req.user!._id.toString(),
+        req.body
+    );
+    if (ok) {
+        res.sendStatus(204); // No Content
+        return;
+    }
+
+    // не обновилось -> либо нет коммента, либо он чужой
+    const doc = await commentsRepository.findCommentById(id);
+    if (!doc) {
+        res.sendStatus(404);
+        return;
+    }
+
+    res.sendStatus(403);
 })

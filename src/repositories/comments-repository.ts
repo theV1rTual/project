@@ -34,6 +34,20 @@ export const commentsRepository = {
         return res.deletedCount === 1;
     },
 
+    async updateByIdAndOwner(
+        id: string,
+        ownerId: string,
+        update: { content: string }
+    ): Promise<boolean> {
+        if (!ObjectId.isValid(id)) return false;
+
+        const res = await commentsCollection.updateOne(
+            { _id: new ObjectId(id), 'commentatorInfo.userId': ownerId },
+            { $set: { content: update.content } }
+        );
+        return res.matchedCount === 1 && res.modifiedCount === 1;
+    },
+
     async findAllComments(params: {
         sortBy: string,
         sortDirection: string,
