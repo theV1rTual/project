@@ -3,6 +3,7 @@ import {commentsRepository} from "../repositories/comments-repository";
 import {authMiddleware} from "../middlewares/auth";
 import {commentsCollection} from "../repositories/db";
 import {ObjectId} from 'mongodb'
+import {commentCreateValidator} from "../middlewares/validators/comments";
 
 export const commentsRouter = Router({})
 
@@ -30,7 +31,7 @@ commentsRouter.delete('/:id', authMiddleware, async (req: Request, res: Response
     return res.sendStatus(403);
 });
 
-commentsRouter.put('/:id', authMiddleware, async (req: Request, res: Response) => {
+commentsRouter.put('/:id', authMiddleware, commentCreateValidator, async (req: Request, res: Response) => {
     const { id } = req.params;
 
     // простая валидация id
