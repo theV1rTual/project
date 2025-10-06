@@ -10,18 +10,23 @@ export const basic = expressBasicAuth({
 })
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    if (!req.headers.authorization) {
-        res.send(401)
-        return;
+    const auth = req.header('authorization');
+    if (!auth || !auth.startsWith('Bearer ')) {
+        return res.sendStatus(401);
     }
 
-    const token =  req.headers.authorization.split(' ')[1];
+    const token = auth.split(' ')[1];
 
     const userId = await jwtService.getUserIdByToken(token);
-    if (userId) {
-        req.user = await UsersService.findUserById(userId.toString());
-        next();
+    if (!userId) {
+        return res.sendStatus(401);
     }
 
-    return res.sendStatus(401);
-}
+    const user = await UsersService.findUserById(userId.toString());
+    if (!user) {
+        return res.sendStatus(401);
+    }
+
+    req.user = user;
+    return next(); // ← важно вернуть, чтобы ниже не ушло в 401
+};
