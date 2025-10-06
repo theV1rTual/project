@@ -8,10 +8,7 @@ export const jwtService = {
         const token = jwt.sign({userId: user._id}, settings.JWT_SECRET, {expiresIn: '1h'})
 
         return {
-            resultCode: 0,
-            data: {
-                token: token
-            }
+            accessToken: token
         }
     },
 
