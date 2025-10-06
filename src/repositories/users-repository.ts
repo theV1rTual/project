@@ -63,12 +63,22 @@ export const usersRepository = {
         }
     },
 
-    async findByLogin(login: string): Promise<boolean> {
-        const doc = await usersCollection.findOne({login: {$regex: login, $options: 'i'} })
-        if (!doc) {
-            return false
-        }
-        return true
+    async findById(id: string) {
+        return usersCollection.findOne({ _id: new ObjectId(id) });
+    },
+
+    async findByLogin(login: string) {
+        return usersCollection.findOne({ login });
+    },
+
+    async findByEmail(email: string) {
+        return usersCollection.findOne({ email });
+    },
+
+    async findByLoginOrEmail(loginOrEmail: string) {
+        return usersCollection.findOne({
+            $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
+        });
     },
 
     async login(params: {loginOrEmail: string, password: string}): Promise<boolean> {
