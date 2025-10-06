@@ -1,8 +1,11 @@
-import {commentsCollection} from "./db";
+import {blogsCollection, commentsCollection, usersCollection} from "./db";
 import {ObjectId} from 'mongodb'
 import {BlogDbModel, BlogModel} from "../models/blog.model";
 import {CommentDbModel, CommentModel, CreateCommentModel} from "../models/comment.model";
 import {CreatePostModel} from "../models/post.model";
+import { OptionalUnlessRequiredId } from 'mongodb';
+import {UserDbModel} from "../models/user.model";
+
 
 const mapComment = (doc: CommentDbModel): CommentModel => ({
     id: doc._id.toString(),
@@ -11,11 +14,43 @@ const mapComment = (doc: CommentDbModel): CommentModel => ({
     createdAt: doc.createdAt
 });
 
+const COMMENT_SORTABLE_FIELDS = new Set(['content', 'createdAt', 'id', '_id'])
+
 export const commentsRepository = {
     async findCommentById(id: string): Promise<CommentModel | null> {
         if (!ObjectId.isValid(id)) return null;
         const comment = await commentsCollection.findOne({_id: new ObjectId(id)})
         return comment ? mapComment(comment) : null;
+    },
+
+    async findAllComments(params: {
+        sortBy: string,
+        sortDirection: string,
+        pageNumber: number,
+        pageSize: number,
+    }) {
+        const { sortBy, sortDirection, pageNumber, pageSize } = params;
+
+        const filter: any = {}
+
+        const sortField = COMMENT_SORTABLE_FIELDS.has(sortBy) ? sortBy : 'createdAt';
+        const sortValue = sortDirection === 'asc' ? 1 : -1;
+
+        const totalCount = await commentsCollection.countDocuments(filter)
+
+        const docs  = await commentsCollection.find(filter)
+            .sort({ [sortField === 'id' ? '_id' : sortField] : sortValue})
+            .skip((pageNumber - 1) * pageSize)
+            .limit(pageSize)
+            .toArray()
+
+        return {
+            pagesCount: Math.ceil(totalCount / pageSize) || 0,
+            page: pageNumber,
+            pageSize,
+            totalCount,
+            items: docs.map(mapComment)
+        }
     },
 
     async deleteComment(id: string): Promise<boolean> {
@@ -33,5 +68,22 @@ export const commentsRepository = {
         )
 
         return result.matchedCount === 1;
+    },
+
+    async create(user: UserDbModel, comment: CreateCommentModel): Promise<CommentModel> {
+        const doc: CommentDbModel = {
+            _id: new ObjectId(),
+            content: comment.content.trim(),
+            commentatorInfo: {
+                userId: user._id.toString(),
+                userLogin: user.login,
+            },
+            createdAt: new Date(),
+        };
+
+        const {insertedId} = await commentsCollection.insertOne(doc);
+        const created = await commentsCollection.findOne({_id: insertedId})
+
+        return mapComment(created!)
     }
 }
