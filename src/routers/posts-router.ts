@@ -48,7 +48,7 @@ postsRouter.post('/:id/comments', authMiddleware, commentCreateValidator, async 
     res.status(201).json(created)
 })
 
-postsRouter.get('/:id/comments', authMiddleware, async (req: Request, res: Response) => {
+postsRouter.get('/:id/comments', async (req: Request, res: Response) => {
     const {
         pageNumber = 1,
         pageSize = 10,
