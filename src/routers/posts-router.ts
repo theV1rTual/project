@@ -67,9 +67,11 @@ postsRouter.get('/:id/comments', async (req: Request, res: Response) => {
         sortDirection: sortDirection.toString()
     }
 
+    const postId = req.params.id;
+
     const searchedPost = await postsRepository.findOnePost(req.params.id);
     if (searchedPost) {
-        const comments = await commentsRepository.findAllComments(query);
+        const comments = await commentsRepository.findAllComments(postId, query);
         return res.status(200).json(comments);
     }
 

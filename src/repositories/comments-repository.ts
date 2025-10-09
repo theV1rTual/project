@@ -48,7 +48,9 @@ export const commentsRepository = {
         return res.matchedCount === 1 && res.modifiedCount === 1;
     },
 
-    async findAllComments(params: {
+    async findAllComments(
+        postId: string,
+        params: {
         sortBy: string,
         sortDirection: string,
         pageNumber: number,
@@ -56,14 +58,17 @@ export const commentsRepository = {
     }) {
         const { sortBy, sortDirection, pageNumber, pageSize } = params;
 
-        const filter: any = {}
+        const filter: any = {
+            postId: ObjectId.isValid(postId) ? new ObjectId(postId) : postId
+        }
 
         const sortField = COMMENT_SORTABLE_FIELDS.has(sortBy) ? sortBy : 'createdAt';
         const sortValue = sortDirection === 'asc' ? 1 : -1;
 
         const totalCount = await commentsCollection.countDocuments(filter)
 
-        const docs  = await commentsCollection.find(filter)
+        const docs  = await commentsCollection
+            .find(filter)
             .sort({ [sortField === 'id' ? '_id' : sortField] : sortValue})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
