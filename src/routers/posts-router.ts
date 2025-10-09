@@ -62,8 +62,15 @@ postsRouter.get('/:id/comments', async (req: Request, res: Response) => {
         sortBy: sortBy.toString(),
         sortDirection: sortDirection.toString()
     }
-    const comments = await commentsRepository.findAllComments(query);
-    res.status(200).json(comments);
+
+    const searchedPost = await postsRepository.findOnePost(req.params.id);
+    if (searchedPost) {
+        const comments = await commentsRepository.findAllComments(query);
+        return res.status(200).json(comments);
+    }
+
+    return res.sendStatus(404)
+
 })
 
 postsRouter.delete('/:id', basic, async (req: Request, res: Response) => {
