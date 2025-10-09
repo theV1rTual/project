@@ -46,7 +46,7 @@ postsRouter.post('/', basic, postCreateValidation, validateRequest, async (req: 
 postsRouter.post('/:id/comments', authMiddleware, commentCreateValidator, validateRequest, async (req: Request, res: Response) => {
     const searchedPost = await postsRepository.findOnePost(req.params.id);
     if (searchedPost) {
-        const created = await commentsRepository.create(req.user!, req.body);
+        const created = await commentsRepository.create(req.user!, req.body, req.params.id);
         return res.status(201).json(created)
     }
     return res.sendStatus(404);

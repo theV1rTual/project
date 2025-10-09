@@ -22,5 +22,6 @@ export type CommentModel = {
 }
 
 export type CreateCommentModel = {
+    postId: string,
     content: string
 }

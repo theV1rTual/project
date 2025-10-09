@@ -58,9 +58,10 @@ export const commentsRepository = {
     }) {
         const { sortBy, sortDirection, pageNumber, pageSize } = params;
 
-        const filter: any = {
-            _id: new ObjectId(postId)
-        }
+        // или «двойной», если в базе могут быть оба формата:
+        const filter = ObjectId.isValid(postId)
+            ? { $or: [{ postId }, { postId: new ObjectId(postId) }] }
+            : { postId };
 
         const sortField = COMMENT_SORTABLE_FIELDS.has(sortBy) ? sortBy : 'createdAt';
         const sortValue = sortDirection === 'asc' ? 1 : -1;
@@ -99,9 +100,10 @@ export const commentsRepository = {
         return result.matchedCount === 1;
     },
 
-    async create(user: UserDbModel, comment: CreateCommentModel): Promise<CommentModel> {
-        const doc: CommentDbModel = {
+    async create(user: UserDbModel, comment: CreateCommentModel, postId: string): Promise<CommentModel> {
+        const doc = {
             _id: new ObjectId(),
+            postId: postId,
             content: comment.content.trim(),
             commentatorInfo: {
                 userId: user._id.toString(),
