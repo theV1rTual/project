@@ -58,9 +58,10 @@ export const commentsRepository = {
     }) {
         const { sortBy, sortDirection, pageNumber, pageSize } = params;
 
-        const filter: any = {
-            postId: ObjectId.isValid(postId) ? new ObjectId(postId) : postId
-        }
+        const filter =
+            ObjectId.isValid(postId)
+                ? { $or: [ { postId }, { postId: new ObjectId(postId) } ] }
+                : { postId };
 
         const sortField = COMMENT_SORTABLE_FIELDS.has(sortBy) ? sortBy : 'createdAt';
         const sortValue = sortDirection === 'asc' ? 1 : -1;
