@@ -58,18 +58,16 @@ export const commentsRepository = {
     }) {
         const { sortBy, sortDirection, pageNumber, pageSize } = params;
 
-        const filter =
-            ObjectId.isValid(postId)
-                ? { $or: [ { postId }, { postId: new ObjectId(postId) } ] }
-                : { postId };
+        const filter: any = {
+            _id: new ObjectId(postId)
+        }
 
         const sortField = COMMENT_SORTABLE_FIELDS.has(sortBy) ? sortBy : 'createdAt';
         const sortValue = sortDirection === 'asc' ? 1 : -1;
 
         const totalCount = await commentsCollection.countDocuments(filter)
 
-        const docs  = await commentsCollection
-            .find(filter)
+        const docs  = await commentsCollection.find(filter)
             .sort({ [sortField === 'id' ? '_id' : sortField] : sortValue})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
