@@ -43,7 +43,7 @@ postsRouter.post('/', basic, postCreateValidation, validateRequest, async (req: 
     res.status(201).json(created)
 })
 
-postsRouter.post('/:id/comments', authMiddleware, commentCreateValidator, async (req: Request, res: Response) => {
+postsRouter.post('/:id/comments', authMiddleware, commentCreateValidator, validateRequest, async (req: Request, res: Response) => {
     const created = await commentsRepository.create(req.user!, req.body);
     res.status(201).json(created)
 })
