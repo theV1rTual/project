@@ -88,6 +88,7 @@ export const UsersService = {
             // 1) Логируем и всё равно возвращаем 204 (потом юзер нажмёт "resend")
             // 2) Откатываем пользователя и возвращаем 500
             console.error('sendEmail failed:', e);
+            return false;
             // реши стратегию сам; чаще выбирают (1)
         }
     },
