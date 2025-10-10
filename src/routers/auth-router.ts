@@ -32,10 +32,14 @@ authRouter.post('/registration-confirmation', async (req: Request, res: Response
 authRouter.post('/registration', async (req: Request, res: Response) => {
     try {
         const { login, email, password } = req.body ?? {};
-        if (!login || !email || !password) return res.sendStatus(400);
+        if (!login || !email || !password) return res.sendStatus(400).json({
+            error: "бля я тут"
+        });
 
         const ok = await UsersService.register(login, email, password);
-        return res.sendStatus(ok ? 204 : 400);
+        return res.sendStatus(ok ? 204 : 400).json({
+            error: 'попался'
+        });
     } catch (e) {
         console.error('registration error:', e);
         return res.sendStatus(500);
