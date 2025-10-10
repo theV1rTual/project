@@ -56,14 +56,16 @@ export const UsersService = {
     async register(login: string, email: string, password: string) {
         email = email.toLowerCase();
 
-        if (!await usersRepository.findByLogin(login) || !await usersRepository.findByEmail(email)) {
-            return false;
+        const loginTaken = await usersRepository.findByLogin(login);
+        const emailTaken = await usersRepository.findByEmail(email);
+        if (loginTaken || emailTaken) {
+            return false; // 400
         }
 
         const passwordHash = await bcrypt.hash(password, 10);
         const now = new Date();
         const code = genCode();
-        const expiresAt = new Date(now.getTime() + CONFIRM_TTL_HOURS + 3600_000)
+        const expiresAt = new Date(now.getTime() + CONFIRM_TTL_HOURS * 3600_000)
 
         const created = await usersRepository.create({
             login,
