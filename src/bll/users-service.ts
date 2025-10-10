@@ -78,7 +78,7 @@ export const UsersService = {
 
         const link = `https://project-five-sand.vercel.app/confirm?code=${encodeURIComponent(code)}`
         try {
-            await emailAdapter.sendEmail(
+            return await emailAdapter.sendEmail(
                 email,
                 'Подтверждение регистрации',
                 `<p>Ваш код: <b>${code}</b></p><p><a href="${link}">${link}</a></p>`
