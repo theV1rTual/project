@@ -111,7 +111,13 @@ export const usersRepository = {
             createdAt: new Date(),
             login: data.login,
             email: data.email,
-            password: data.password
+            password: data.password,
+            confirmation: {
+                sentAt: data.confirmation!.sentAt,
+                used: data.confirmation!.used,
+                code: data.confirmation!.code,
+                expiredAt: data.confirmation!.expiresAt
+            }
         }
 
         const {insertedId} = await usersCollection.insertOne(doc);

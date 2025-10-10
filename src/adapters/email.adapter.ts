@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer'
 
 export const emailAdapter = {
-    async sendEmail(email: string, subject: string, message: string) {
+    async sendEmail(to: string, subject: string, html: string) {
         let transport = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -12,9 +12,9 @@ export const emailAdapter = {
 
         let info = await transport.sendMail({
             from: 'arystandev@gmail.com',   // sender address
-            subject: email,
-            to: subject,
-            html: message
+            to,
+            subject,
+            html,
         })
 
         return info;
