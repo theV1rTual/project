@@ -71,8 +71,12 @@ export const usersRepository = {
         return usersCollection.findOne({ login });
     },
 
-    async findByEmail(email: string) {
+    async findByEmail(email: string): Promise<UserDbModel | null> {
         return usersCollection.findOne({ email });
+    },
+
+    async findByConfirmationCode(code: string): Promise<UserDbModel | null>   {
+        return usersCollection.findOne({'confirmation.code': code})
     },
 
     async findByLoginOrEmail(loginOrEmail: string) {
@@ -101,7 +105,7 @@ export const usersRepository = {
         return result.deletedCount === 1;
     },
 
-    async create(data: {login: string, password: string, email: string}): Promise<UserModel> {
+    async create(data: {login: string, password: string, email: string, isConfirmed: boolean, confirmation: {code: string, expiresAt: Date, sentAt: Date, used: boolean}, createdAt: Date}): Promise<UserModel> {
         const doc: UserDbModel = {
             _id: new ObjectId(),
             createdAt: new Date(),
@@ -114,5 +118,19 @@ export const usersRepository = {
         const created = await usersCollection.findOne({_id: insertedId})
 
         return mapUser(created)
+    },
+
+    async markConfirmed(_id: ObjectId) {
+        await usersCollection.updateOne(
+            { _id},
+            {$set: {isConfirmed: true}, $unset: { confirmation: '' }}
+        )
+    },
+
+    async setConfirmation(userId: ObjectId, payload: NonNullable<UserDbModel['confirmation']>) {
+        await usersCollection.updateOne(
+            {_id: userId},
+            {$set: {confirmation: payload}}
+        )
     }
 }

@@ -18,6 +18,38 @@ authRouter.post('/login', async (req: Request, res: Response) => {
     }
 });
 
+authRouter.post('/registration-confirmation', async (req: Request, res: Response) => {
+    //  тут чекает код в боди. Типа если он окей, значит 204
+
+    const result = await UsersService.confirmRegistration(req.body.code);
+    if (!result) {
+        return res.sendStatus(400)
+    }
+    return res.sendStatus(204);
+
+})
+
+authRouter.post('/registration', async (req: Request, res: Response) => {
+    const {login, email, password} = req.body;
+    const result = await UsersService.register(login, email, password)
+    if (!result) {
+        return res.sendStatus(400)
+    }
+    return res.sendStatus(204)
+    // отправляется email на почту, которую указал пользователь
+})
+
+authRouter.post('/registration-email-resending', async (req: Request, res: Response) => {
+    // отпрвляет повторвный email на почту с кодом
+
+    const result = await UsersService.resendingRegistrationEmail(req.body.email)
+
+    if (!result) return res.sendStatus(400)
+    return res.sendStatus(204)
+})
+
+
+
 authRouter.get('/me', authMiddleware, async (req: Request, res: Response) => {
     const doc = await usersRepository.findById((req.user?._id ? req.user?._id : '').toString());
     if (doc) {

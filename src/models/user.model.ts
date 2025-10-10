@@ -6,6 +6,12 @@ export type UserDbModel = {
     email: string;
     createdAt: Date;
     password: string;
+    confirmation?: {
+        code: string,
+        expiredAt: Date,
+        sentAt: Date,
+        used: boolean
+    }
 }
 
 export type UserModel = {

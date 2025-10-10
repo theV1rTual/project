@@ -10,7 +10,8 @@
     "express-basic-auth": "^1.2.1",
     "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
-    "mongo": "^0.1.0"
+    "mongo": "^0.1.0",
+    "nodemailer": "^7.0.9"
   },
   "scripts": {
     "dev": "nodemon --inspect dist/index.js",
@@ -21,6 +22,7 @@
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.5.2",
+    "@types/nodemailer": "^7.0.2",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
