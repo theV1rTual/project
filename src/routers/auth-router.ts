@@ -4,7 +4,11 @@ import {usersRepository} from "../repositories/users-repository";
 import {UsersService} from "../bll/users-service";
 import jwt from "jsonwebtoken";
 import {jwtService} from "../common/jwt.service";
-import {registerValidation} from "../middlewares/validators/auth";
+import {
+    registerValidation,
+    registrationConfirmationValidation,
+    registrationResendValidation
+} from "../middlewares/validators/auth";
 import {validateRequest} from "../middlewares/validators/validateRequest";
 
 export const authRouter = Router({})
@@ -20,7 +24,7 @@ authRouter.post('/login', async (req: Request, res: Response) => {
     }
 });
 
-authRouter.post('/registration-confirmation', async (req: Request, res: Response) => {
+authRouter.post('/registration-confirmation', registrationConfirmationValidation, validateRequest, async (req: Request, res: Response) => {
     //  тут чекает код в боди. Типа если он окей, значит 204
 
     const result = await UsersService.confirmRegistration(req.body.code);
@@ -43,7 +47,7 @@ authRouter.post('/registration', registerValidation, validateRequest, async (req
     // отправляется email на почту, которую указал пользователь
 })
 
-authRouter.post('/registration-email-resending', async (req: Request, res: Response) => {
+authRouter.post('/registration-email-resending', registrationResendValidation, validateRequest, async (req: Request, res: Response) => {
     // отпрвляет повторвный email на почту с кодом
 
     const result = await UsersService.resendingRegistrationEmail(req.body.email)

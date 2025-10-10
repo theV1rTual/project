@@ -47,3 +47,39 @@ export const registerValidation = [
         .isString().withMessage('password should be a string')
         .isLength({min: 6, max: 20}).withMessage('password length should be more than 6 and less than 20')
 ]
+
+export const registrationResendValidation = [
+    body('email')
+        .exists().withMessage('email is required')
+        .bail()
+        .trim()
+        .notEmpty().withMessage('email is required')
+        .bail()
+        .isString().withMessage('email should be a string')
+        .isEmail()
+        .bail()
+        .custom(async (email: string) => {
+            const taken = await usersRepository.findByEmail(email)
+            if (taken) {
+                throw new Error('email is taken')
+            }
+            return true
+        }),
+]
+
+export const registrationConfirmationValidation = [
+    body('code')
+        .exists().withMessage('email is required')
+        .bail()
+        .trim()
+        .notEmpty().withMessage('email is required')
+        .bail()
+        .isString().withMessage('email should be a string')
+        .custom(async (code: string) => {
+            const exists = await usersRepository.findByConfirmationCode(code)
+            if (exists) {
+                throw new Error('code exists')
+            }
+            return true;
+        })
+]
