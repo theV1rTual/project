@@ -28,7 +28,7 @@ export const registerValidation = [
         .notEmpty().withMessage('email is required')
         .bail()
         .isString().withMessage('email should be a string')
-        .matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
+        .isEmail(),
         .bail()
         .custom(async (email: string) => {
             const taken = await usersRepository.findByEmail(email)
