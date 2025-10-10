@@ -58,13 +58,6 @@ export const registrationResendValidation = [
         .isString().withMessage('email should be a string')
         .isEmail()
         .bail()
-        .custom(async (email: string) => {
-            const taken = await usersRepository.findByEmail(email)
-            if (taken) {
-                throw new Error('email is taken')
-            }
-            return true
-        }),
 ]
 
 export const registrationConfirmationValidation = [
