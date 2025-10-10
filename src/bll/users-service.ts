@@ -56,12 +56,6 @@ export const UsersService = {
     async register(login: string, email: string, password: string) {
         email = email.toLowerCase();
 
-        const loginTaken = await usersRepository.findByLogin(login);
-        const emailTaken = await usersRepository.findByEmail(email);
-        if (loginTaken || emailTaken) {
-            return false; // 400
-        }
-
         const passwordHash = await bcrypt.hash(password, 10);
         const now = new Date();
         const code = genCode();

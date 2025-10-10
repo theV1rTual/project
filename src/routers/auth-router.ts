@@ -4,6 +4,8 @@ import {usersRepository} from "../repositories/users-repository";
 import {UsersService} from "../bll/users-service";
 import jwt from "jsonwebtoken";
 import {jwtService} from "../common/jwt.service";
+import {registerValidation} from "../middlewares/validators/auth";
+import {validateRequest} from "../middlewares/validators/validateRequest";
 
 export const authRouter = Router({})
 
@@ -29,18 +31,10 @@ authRouter.post('/registration-confirmation', async (req: Request, res: Response
 
 })
 
-authRouter.post('/registration', async (req: Request, res: Response) => {
+authRouter.post('/registration', registerValidation, validateRequest, async (req: Request, res: Response) => {
     try {
         const { login, email, password } = req.body ?? {};
-        if (!login || !email || !password) return res.sendStatus(400).json({
-            error: "бля я тут"
-        });
-
         const ok = await UsersService.register(login, email, password);
-        if (!ok) {
-            return res.status(400).json()
-        }
-
         return res.status(204).json('Input data is accepted. Email with confirmation code will be send to passed email address. Confirmation code should be inside link as query param, for example: https://some-front.com/confirm-registration?code=youtcodehere')
     } catch (e) {
         console.error('registration error:', e);
