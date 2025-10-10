@@ -10,13 +10,12 @@ export const emailAdapter = {
             }
         })
 
-        let info = await transport.sendMail({
+        return transport.sendMail({
             from: 'arystandev@gmail.com',   // sender address
             to,
             subject,
             html,
         })
 
-        return info;
     }
 }
