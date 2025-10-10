@@ -25,7 +25,7 @@ authRouter.post('/registration-confirmation', async (req: Request, res: Response
     if (!result) {
         return res.sendStatus(400)
     }
-    return res.sendStatus(204);
+    return res.sendStatus(204).json( 'Email was verified. Account was activated');
 
 })
 
@@ -37,9 +37,11 @@ authRouter.post('/registration', async (req: Request, res: Response) => {
         });
 
         const ok = await UsersService.register(login, email, password);
-        return res.sendStatus(ok ? 204 : 400).json({
-            error: 'попался'
-        });
+        if (!ok) {
+            return res.status(400).json()
+        }
+
+        return res.status(204).json('Input data is accepted. Email with confirmation code will be send to passed email address. Confirmation code should be inside link as query param, for example: https://some-front.com/confirm-registration?code=youtcodehere')
     } catch (e) {
         console.error('registration error:', e);
         return res.sendStatus(500);
@@ -53,7 +55,7 @@ authRouter.post('/registration-email-resending', async (req: Request, res: Respo
     const result = await UsersService.resendingRegistrationEmail(req.body.email)
 
     if (!result) return res.sendStatus(400)
-    return res.sendStatus(204)
+    return res.sendStatus(204).json('Input data is accepted. Email with confirmation code will be send to passed email address. Confirmation code should be inside link as query param, for example: https://some-front.com/confirm-registration?code=youtcodehere')
 })
 
 
