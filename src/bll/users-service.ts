@@ -77,11 +77,19 @@ export const UsersService = {
         })
 
         const link = `https://project-five-sand.vercel.app/confirm?code=${encodeURIComponent(code)}`
-        await emailAdapter.sendEmail(
-            email,
-            'Подтверждение регистрации',
-            `<p>Ваш код: <b>${code}</b></p><p><a href="${link}">${link}</a></p>`
-        )
+        try {
+            await emailAdapter.sendEmail(
+                email,
+                'Подтверждение регистрации',
+                `<p>Ваш код: <b>${code}</b></p><p><a href="${link}">${link}</a></p>`
+            );
+        } catch (e) {
+            // Варианты:
+            // 1) Логируем и всё равно возвращаем 204 (потом юзер нажмёт "resend")
+            // 2) Откатываем пользователя и возвращаем 500
+            console.error('sendEmail failed:', e);
+            // реши стратегию сам; чаще выбирают (1)
+        }
 
         return true
     },

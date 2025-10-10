@@ -30,12 +30,16 @@ authRouter.post('/registration-confirmation', async (req: Request, res: Response
 })
 
 authRouter.post('/registration', async (req: Request, res: Response) => {
-    const {login, email, password} = req.body;
-    const result = await UsersService.register(login, email, password)
-    if (!result) {
-        return res.sendStatus(400)
+    try {
+        const { login, email, password } = req.body ?? {};
+        if (!login || !email || !password) return res.sendStatus(400);
+
+        const ok = await UsersService.register(login, email, password);
+        return res.sendStatus(ok ? 204 : 400);
+    } catch (e) {
+        console.error('registration error:', e);
+        return res.sendStatus(500);
     }
-    return res.sendStatus(204)
     // отправляется email на почту, которую указал пользователь
 })
 
