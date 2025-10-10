@@ -62,17 +62,11 @@ export const registrationResendValidation = [
 
 export const registrationConfirmationValidation = [
     body('code')
-        .exists().withMessage('email is required')
+        .exists().withMessage('code is required')
         .bail()
         .trim()
-        .notEmpty().withMessage('email is required')
+        .notEmpty().withMessage('code is required')
         .bail()
-        .isString().withMessage('email should be a string')
-        .custom(async (code: string) => {
-            const exists = await usersRepository.findByConfirmationCode(code)
-            if (exists) {
-                throw new Error('code exists')
-            }
-            return true;
-        })
+        .isString().withMessage('code should be a string')
+
 ]
