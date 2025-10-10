@@ -105,7 +105,7 @@ export const usersRepository = {
         return result.deletedCount === 1;
     },
 
-    async create(data: {login: string, password: string, email: string, isConfirmed: boolean, confirmation: {code: string, expiresAt: Date, sentAt: Date, used: boolean}, createdAt: Date}): Promise<UserModel> {
+    async create(data: {login: string, password: string, email: string, isConfirmed?: boolean, confirmation?: {code: string, expiresAt: Date, sentAt: Date, used: boolean}, createdAt?: Date}): Promise<UserModel> {
         const doc: UserDbModel = {
             _id: new ObjectId(),
             createdAt: new Date(),
