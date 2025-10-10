@@ -90,8 +90,6 @@ export const UsersService = {
             console.error('sendEmail failed:', e);
             // реши стратегию сам; чаще выбирают (1)
         }
-
-        return true
     },
 
     async confirmRegistration(code: string) {
