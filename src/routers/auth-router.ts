@@ -55,7 +55,7 @@ authRouter.post('/registration-email-resending', registrationResendValidation, v
     const result = await UsersService.resendingRegistrationEmail(req.body.email)
 
     if (!result) return res.status(400).json({
-        errorsMessages: [{ message: 'email is not found or already confirmed', field: "code" }]
+        errorsMessages: [{ message: 'email is not found or already confirmed', field: "email" }]
     })
     return res.sendStatus(204).json('Input data is accepted. Email with confirmation code will be send to passed email address. Confirmation code should be inside link as query param, for example: https://some-front.com/confirm-registration?code=youtcodehere')
 })
