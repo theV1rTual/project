@@ -1,5 +1,4 @@
 import {body} from "express-validator";
-import {UsersService} from "../../bll/users-service";
 import {usersRepository} from "../../repositories/users-repository";
 
 export const registerValidation = [
@@ -68,5 +67,12 @@ export const registrationConfirmationValidation = [
         .notEmpty().withMessage('code is required')
         .bail()
         .isString().withMessage('code should be a string')
+        .custom(async (code: string) => {
+            const valid = await usersRepository.findByConfirmationCode(code);
+            if (valid?.confirmation?.used) {
+                throw new Error('code is already confirmed')
+            }
+            return true;
+        })
 
 ]
