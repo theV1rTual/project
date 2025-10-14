@@ -106,18 +106,21 @@ export const usersRepository = {
     },
 
     async create(data: {login: string, password: string, email: string, isConfirmed?: boolean, confirmation?: {code: string, expiresAt: Date, sentAt: Date, used: boolean}, createdAt?: Date}): Promise<UserModel> {
+        const confirmation = data.confirmation ? {
+            sentAt: data.confirmation!.sentAt,
+            used: data.confirmation!.used,
+            code: data.confirmation!.code,
+            expiredAt: data.confirmation!.expiresAt
+        } : undefined
+
         const doc: UserDbModel = {
             _id: new ObjectId(),
             createdAt: new Date(),
             login: data.login,
             email: data.email,
             password: data.password,
-            confirmation: {
-                sentAt: data.confirmation!.sentAt,
-                used: data.confirmation!.used,
-                code: data.confirmation!.code,
-                expiredAt: data.confirmation!.expiresAt
-            }
+            ...(confirmation && { confirmation }),
+            ...(data.isConfirmed !== undefined && { isConfirmed: data.isConfirmed }),
         }
 
         const {insertedId} = await usersCollection.insertOne(doc);
