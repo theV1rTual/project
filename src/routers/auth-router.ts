@@ -29,7 +29,9 @@ authRouter.post('/registration-confirmation', registrationConfirmationValidation
 
     const result = await UsersService.confirmRegistration(req.body.code);
     if (!result) {
-        return res.sendStatus(400)
+        return res.status(400).json({
+            errorsMessages: [{ message: 'user is already confirmed or code not found', field: "code" }]
+        })
     }
     return res.sendStatus(204).json( 'Email was verified. Account was activated');
 
