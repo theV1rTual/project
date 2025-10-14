@@ -57,6 +57,16 @@ export const registrationResendValidation = [
         .isString().withMessage('email should be a string')
         .isEmail()
         .bail()
+        .custom(async (email: string) => {
+            const valid = await usersRepository.findByEmail(email);
+
+            // @ts-ignore
+            if (valid?.confirmation?.used || valid?.confirmation.isConfirmed) {
+                throw new Error('email is already confirmed')
+            }
+
+            return true;
+        })
 ]
 
 export const registrationConfirmationValidation = [
