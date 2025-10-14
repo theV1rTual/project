@@ -75,7 +75,7 @@ export const usersRepository = {
         return usersCollection.findOne({ email });
     },
 
-    async findByConfirmationCode(code: string): Promise<UserDbModel | null>   {
+    async findByConfirmationCode(code: string)   {
         return usersCollection.findOne({'confirmation.code': code})
     },
 

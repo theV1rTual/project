@@ -69,7 +69,8 @@ export const registrationConfirmationValidation = [
         .isString().withMessage('code should be a string')
         .custom(async (code: string) => {
             const valid = await usersRepository.findByConfirmationCode(code);
-            if (valid?.confirmation?.used) {
+            // @ts-ignore
+            if (valid?.confirmation?.used || valid?.confirmation.isConfirmed) {
                 throw new Error('code is already confirmed')
             }
             return true;
