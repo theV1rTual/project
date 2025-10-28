@@ -63,6 +63,7 @@ authRouter.post('/refresh-token', async (req: Request, res: Response) => {
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
+        path: '/',
         maxAge: 20 * 1000
     })
 
