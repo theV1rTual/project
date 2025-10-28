@@ -9,6 +9,7 @@ import {
     registrationResendValidation
 } from "../middlewares/validators/auth";
 import {validateRequest} from "../middlewares/validators/validateRequest";
+import jwt from "jsonwebtoken";
 
 export const authRouter = Router({})
 
@@ -33,6 +34,41 @@ authRouter.post('/login', async (req: Request, res: Response) => {
 
     return res.status(200).send(accessToken);
 });
+
+authRouter.post('/refresh-token', async (req: Request, res: Response) => {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+        return res.sendStatus(401);
+    }
+
+    const userId = await UsersService.findUserByRefreshToken(refreshToken);
+    if (!userId) return res.sendStatus(401);
+
+    const isValid = await UsersService.isRefreshTokenValid(userId, refreshToken);
+    if (!isValid) return res.sendStatus(401);
+
+    await UsersService.invalidateRefreshToken(userId, refreshToken);
+
+    const user = await usersRepository.findById(userId);
+    if (!user) {
+        return res.sendStatus(401);
+    }
+
+    const newAccessToken = await jwtService.createJWT(user);
+    const newRefreshToken = await jwtService.createRefreshToken(user);
+
+    await UsersService.saveRefreshToken(userId, newRefreshToken)
+
+    res.cookie('refreshToken', newRefreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: 20 * 1000
+    })
+
+    return res.status(200).json({accessToken: newAccessToken})
+
+})
 
 authRouter.post('/registration-confirmation', registrationConfirmationValidation, validateRequest, async (req: Request, res: Response) => {
     //  тут чекает код в боди. Типа если он окей, значит 204

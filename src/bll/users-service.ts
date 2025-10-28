@@ -4,6 +4,8 @@ import {hashPassword} from "../common/hashing";
 import bcrypt from 'bcrypt'
 import {randomBytes} from "crypto";
 import {emailAdapter} from "../adapters/email.adapter";
+import jwt from "jsonwebtoken";
+import {settings} from "../common/settings";
 
 function genCode(): string {
     return randomBytes(16).toString('hex')
@@ -53,6 +55,24 @@ export const UsersService = {
 
     async findUserById(id: string): Promise<UserDbModel| null> {
         return usersRepository.findById(id);
+    },
+
+    async findUserByAccessToken(token: string) {
+        try {
+            const result: any = jwt.verify(token, settings.JWT_SECRET);
+            return result.userId
+        } catch {
+            return null
+        }
+    },
+
+    async findUserByRefreshToken(token: string) {
+        try {
+            const result: any = jwt.verify(token, settings.REFRESH_SECRET);
+            return result.userId
+        } catch {
+            return null
+        }
     },
 
     async checkCredentials(
