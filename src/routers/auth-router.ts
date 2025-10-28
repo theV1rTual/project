@@ -35,41 +35,36 @@ authRouter.post('/login', async (req: Request, res: Response) => {
     return res.status(200).send(accessToken);
 });
 
-authRouter.post('/refresh-token', async (req: Request, res: Response) => {
-    const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) {
-        return res.sendStatus(401);
-    }
+authRouter.post('/refresh-token', async (req, res) => {
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) return res.sendStatus(401);
 
-    const userId = await UsersService.findUserByRefreshToken(refreshToken);
-    if (!userId) return res.sendStatus(401);
+    const userId = jwtService.getUserIdByRefreshToken(refreshToken);
+    if (!userId) return res.sendStatus(401);       // истёк/битый
 
-    const isValid = await UsersService.isRefreshTokenValid(userId, refreshToken);
-    if (!isValid) return res.sendStatus(401);
+    const ok = await UsersService.isRefreshTokenValid(userId, refreshToken);
+    if (!ok) return res.sendStatus(401);           // отозван/неизвестен
 
     await UsersService.invalidateRefreshToken(userId, refreshToken);
 
     const user = await usersRepository.findById(userId);
-    if (!user) {
-        return res.sendStatus(401);
-    }
+    if (!user) return res.sendStatus(401);
 
-    const newAccessToken = jwtService.createAccessToken(user);
-    const newRefreshToken = jwtService.createRefreshToken(user);
+    const accessToken = jwtService.createAccessToken(user);
+    const newRefresh  = jwtService.createRefreshToken(user);
+    await UsersService.saveRefreshToken(userId, newRefresh);
 
-    await UsersService.saveRefreshToken(userId, newRefreshToken)
-
-    res.cookie('refreshToken', newRefreshToken, {
+    res.cookie('refreshToken', newRefresh, {
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
-        path: '/',
-        maxAge: 20 * 1000
-    })
+        path: '/',            // важно, чтобы тесты увидели куку на других эндпойнтах
+        maxAge: 20 * 1000,
+    });
 
-    return res.status(200).json({accessToken: newAccessToken})
+    return res.status(200).json({ accessToken });
+});
 
-})
 
 authRouter.post('/registration-confirmation', registrationConfirmationValidation, validateRequest, async (req: Request, res: Response) => {
     //  тут чекает код в боди. Типа если он окей, значит 204
@@ -122,15 +117,19 @@ authRouter.get('/me', authMiddleware, async (req: Request, res: Response) => {
     return res.sendStatus(404)
 })
 
-authRouter.post('/logout', async (req: Request, res: Response) => {
-    const refreshToken = req.cookies.refreshToken;
+authRouter.post('/logout', async (req, res) => {
+    const refreshToken = req.cookies?.refreshToken;
     if (!refreshToken) return res.sendStatus(401);
 
-    const userId = await jwtService.getUserIdByRefreshToken(refreshToken);
-    if (!userId) return res.sendStatus(401);
+    const userId = jwtService.getUserIdByRefreshToken(refreshToken);
+    if (!userId) return res.sendStatus(401); // истёк/битый → 401
+
+    const stillValid = await UsersService.isRefreshTokenValid(userId, refreshToken);
+    if (!stillValid) return res.sendStatus(401);   // уже отозван → 401 (а не 204)
 
     await UsersService.invalidateRefreshToken(userId, refreshToken);
-    res.clearCookie("refreshToken");
+
+    res.clearCookie('refreshToken', { path: '/' }); // path обязателен для уверенного удаления
     return res.sendStatus(204);
-})
+});
 
