@@ -20,8 +20,8 @@ authRouter.post('/login', async (req: Request, res: Response) => {
         return res.sendStatus(401);
     }
 
-    const accessToken = await jwtService.createJWT(user);
-    const refreshToken = await jwtService.createRefreshToken(user);
+    const accessToken = jwtService.createAccessToken(user);
+    const refreshToken = jwtService.createRefreshToken(user);
 
     await UsersService.saveRefreshToken(user._id.toString(), refreshToken);
 
@@ -54,8 +54,8 @@ authRouter.post('/refresh-token', async (req: Request, res: Response) => {
         return res.sendStatus(401);
     }
 
-    const newAccessToken = await jwtService.createJWT(user);
-    const newRefreshToken = await jwtService.createRefreshToken(user);
+    const newAccessToken = jwtService.createAccessToken(user);
+    const newRefreshToken = jwtService.createRefreshToken(user);
 
     await UsersService.saveRefreshToken(userId, newRefreshToken)
 
