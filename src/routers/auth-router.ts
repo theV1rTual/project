@@ -32,7 +32,7 @@ authRouter.post('/login', async (req: Request, res: Response) => {
         maxAge: 20 * 1000
     })
 
-    return res.status(200).send(accessToken);
+    return res.status(200).send({accessToken});
 });
 
 authRouter.post('/refresh-token', async (req, res) => {
