@@ -1,5 +1,5 @@
 import {UserDbModel} from "../models/user.model";
-import jwt, {JwtPayload} from 'jsonwebtoken'
+import jwt, {Jwt, JwtPayload} from 'jsonwebtoken'
 import {settings} from "./settings";
 import {ObjectId} from 'mongodb'
 
@@ -24,5 +24,15 @@ export const jwtService = {
         catch (error) {
             return null
         }
+    },
+
+    async getUserIdByRefreshToken(token: string) {
+        try {
+            const result: any = jwt.verify(token, settings.REFRESH_SECRET) as JwtPayload;
+            return result.userId
+        } catch (error) {
+            return null;
+        }
+
     }
 }

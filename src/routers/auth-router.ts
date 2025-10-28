@@ -122,3 +122,15 @@ authRouter.get('/me', authMiddleware, async (req: Request, res: Response) => {
     return res.sendStatus(404)
 })
 
+authRouter.post('/logout', async (req: Request, res: Response) => {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) return res.sendStatus(401);
+
+    const userId = await jwtService.getUserIdByRefreshToken(refreshToken);
+    if (!userId) return res.sendStatus(401);
+
+    await UsersService.invalidateRefreshToken(userId, refreshToken);
+    res.clearCookie("refreshToken");
+    return res.sendStatus(204);
+})
+
