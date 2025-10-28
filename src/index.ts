@@ -6,6 +6,7 @@ import {postsRouter} from "./routers/posts-router";
 import {usersRouter} from "./routers/users-router";
 import {authRouter} from "./routers/auth-router";
 import {commentsRouter} from "./routers/comments-router";
+import cookieParser from "cookie-parser";
 
 const app = express()
 
@@ -16,6 +17,7 @@ app.use(async (_req, _res, next) => {
 })
 
 app.use(express.json())
+app.use(cookieParser())
 
 app.use('/testing', testingRouter)
 

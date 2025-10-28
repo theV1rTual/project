@@ -1,8 +1,7 @@
 import {Router, Request, Response} from "express";
-import {authMiddleware, basic} from "../middlewares/auth";
+import {authMiddleware} from "../middlewares/auth";
 import {usersRepository} from "../repositories/users-repository";
 import {UsersService} from "../bll/users-service";
-import jwt from "jsonwebtoken";
 import {jwtService} from "../common/jwt.service";
 import {
     registerValidation,
@@ -16,12 +15,23 @@ export const authRouter = Router({})
 authRouter.post('/login', async (req: Request, res: Response) => {
     const user = await UsersService.checkCredentials(req.body.loginOrEmail, req.body.password);
 
-    if (user) {
-        const token = await jwtService.createJWT(user)
-        res.status(200).send(token);
-    } else {
-        res.sendStatus(401);
+    if (!user) {
+        return res.sendStatus(401);
     }
+
+    const accessToken = await jwtService.createJWT(user);
+    const refreshToken = await jwtService.createRefreshToken(user);
+
+    await UsersService.saveRefreshToken(user._id.toString(), refreshToken);
+
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 20 * 1000
+    })
+
+    return res.status(200).send(accessToken);
 });
 
 authRouter.post('/registration-confirmation', registrationConfirmationValidation, validateRequest, async (req: Request, res: Response) => {

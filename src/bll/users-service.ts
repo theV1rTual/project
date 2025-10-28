@@ -1,8 +1,7 @@
-import {CreateUserModel, UserDbModel, UserModel} from "../models/user.model";
+import {CreateUserModel, UserDbModel} from "../models/user.model";
 import {usersRepository} from "../repositories/users-repository";
 import {hashPassword} from "../common/hashing";
 import bcrypt from 'bcrypt'
-import {afterEach} from "node:test";
 import {randomBytes} from "crypto";
 import {emailAdapter} from "../adapters/email.adapter";
 
@@ -13,7 +12,28 @@ function genCode(): string {
 const CONFIRM_TTL_HOURS = 24;
 const RESEND_COOLDOWN_MIN = 10;
 
+const refreshTokenStorage = new Map<string, string[]>();
+
 export const UsersService = {
+
+    async saveRefreshToken(userId: string, token: string) {
+        const tokens = refreshTokenStorage.get(userId) || [];
+        refreshTokenStorage.set(userId, [...tokens, token]);
+    },
+
+    async isRefreshTokenValid(userId: string, token: string) {
+        const tokens = refreshTokenStorage.get(userId) || [];
+        return tokens.includes(token);
+    },
+
+    async invalidateRefreshToken(userId: string, token: string){
+        const tokens = refreshTokenStorage.get(userId) || [];
+        refreshTokenStorage.set(
+            userId,
+            tokens.filter((t) => t !== token)
+        )
+    },
+
     async createUser(user: CreateUserModel) {
         const login = user.login.trim();
 
